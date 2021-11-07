@@ -43,6 +43,84 @@ class Grille :
                 if figure[i][j]=='#':
                     self.tableau[depart+i][depart+j]=1
 
+    def spaceFiller(self):
+        '''
+        cette méthode sert à faire apparaître une figure qui remplie la grille.
+        '''
+        for i in range(hauteur//10):
+            for j in range(largeur//10):
+                self.tableau[i][j] = 0
+        figure=['..................#........',
+                '.................###.......',
+                '............###....##......',
+                '...........#..###..#.##....',
+                '..........#...#.#..#.#.....',
+                '..........#....#.#.#.#.##..',
+                '............#....#.#...##..',
+                '####.....#.#....#...#.###..',
+                '#...##.#.###.##.........##.',
+                '#.....##.....#.............',
+                '.#..##.#..#..#.##..........',
+                '.......#.#.#.#.#.#.....####',
+                '.#..##.#..#..#..##.#.##...#',
+                '#.....##...#.#.#...##.....#',
+                '#...##.#.##..#..#..#.##..#.',
+                '####.....#.#.#.#.#.#.......',
+                '..........##.#..#..#.##..#.',
+                '.............#.....##.....#',
+                '.##.........##.###.#.##...#',
+                '..###.#...#....#.#.....####',
+                '..##...#.#....#............',
+                '..##.#.#.#.#....#..........',
+                '.....#.#..#.#...#..........',
+                '....##.#..###..#...........',
+                '......##....###............',
+                '.......###.................',
+                '........#..................',]
+        depart=largeur//40
+        for i in range(len(figure)):
+            for j in range(len(figure[i])):
+                if figure[i][j]=='#':
+                    self.tableau[depart+i][depart+j+10]=1
+
+    def clock(self):
+        '''
+        cette méthode sert à faire apparaître une figure qui ressenble à une horloge.
+        '''
+        for i in range(hauteur//10):
+            for j in range(largeur//10):
+                self.tableau[i][j] = 0
+        figure=['......##....',
+                '......##....',
+                '............',
+                '....####....',
+                '##.#..#.#...',
+                '##.#.#..#...',
+                '...#.#..#.##',
+                '...#....#.##',
+                '....####....',
+                '............',
+                '....##......',
+                '....##......',]
+        depart=largeur//40
+        for i in range(len(figure)):
+            for j in range(len(figure[i])):
+                if figure[i][j]=='#':
+                    self.tableau[depart+i][depart+j+10]=1
+
+    def pentomino(self): #strucutre se stabilisant apres une centaine de generation formant plusieur structure
+        for i in range(hauteur//10):
+            for j in range(largeur//10):
+                self.tableau[i][j] = 0
+        figure=['.#.',
+                '.##',
+                '##.',]
+        depart = largeur//40
+        for i in range(len(figure)):
+            for j in range(len(figure[i])):
+                if figure[i][j]=='#':
+                    self.tableau[depart+i][depart+j+10]=1
+
     def nb_voisins(self,x,y):
         '''
         on compte le nombre de voisins des cellules
@@ -165,14 +243,38 @@ resolution=(largeur,hauteur)
 fenetre=pygame.display.set_mode(resolution)
 pygame.display.set_caption('Le jeu de la vie')# titre de la fenêtre pygame
 carre_blanc =pygame.image.load("carre_blanc.gif").convert()
+accueil = pygame.image.load("Ecran_daccueil.png").convert()
+controls = pygame.image.load("Ecran_controls.png").convert()
 
 
-
-
-
-
+controle = False # creation d'une variable pour afficher l'ecrand des controles
+debut = True #création d'une variable pour afficher l'ecran d'accueil
 continuer=True
+
 while continuer==True:#tant que continuer est égale à True
+    while debut == True :
+        fenetre.blit(accueil,(0,0))# on affiche l'ecran d'accueil
+        for event in pygame.event.get():
+            if event.type == QUIT:#si on clique sur la croix de la fenêtre on quitte la boucle
+                debut = False
+                continuer = False
+            elif event.type == pygame.KEYDOWN:#si on appuie sur une touche du clavier
+                if event.key == pygame.K_RETURN:#si on appuie sur la touche "entrer" ça lance le jeu de la vie
+                    debut = False
+                elif event.key == pygame.K_SPACE:# sinon si on appuie sur la touche espace on accède à la fenêtre des contrôle
+                    debut = False
+                    controle = True
+        pygame.display.flip()#actualisation de la fenêtre
+    while controle == True :
+        fenetre.blit(controls,(0,0))#on affiche l'ecran des contrôles
+        for event in pygame.event.get():
+            if event.type == QUIT:#si on clique sur la croix de la fenêtre on quitte la boucle
+                controle = False
+                continuer = False
+            if event.type == pygame.KEYDOWN:#si on appuie sur une touche du clavier
+                if event.key == pygame.K_RETURN:#si on appuie sur la touche "entrer" ça lance le jeu de la vie
+                    controle = False
+        pygame.display.flip()#actualisation de la fenêtre
     for event in pygame.event.get():
         if event.type == QUIT:#si on clique sur la croix de la fenêtre on quitte la boucle
             continuer = False
@@ -188,6 +290,15 @@ while continuer==True:#tant que continuer est égale à True
             elif event.key == pygame.K_g:#si on appuie sur la touche g on fait apparaître un gun
                 grille.clear()
                 grille.gun()
+            elif event.key == pygame.K_s:#si on appuie sur la touche s on fait apparaître un spacefiller
+                grille.clear()
+                grille.spaceFiller()
+            elif event.key == pygame.K_c:#si on appuie sur la touche c on fait apparaître une clock
+                grille.clear()
+                grille.clock()
+            elif event.key == pygame.K_p:#si on appuie sur la touche p on fait apparaître un pentomino
+                grille.clear()
+                grille.pentomino()
             elif event.key == pygame.K_UP:#si on appuie sur la flèche du haut
                 if tempo == 1:# si le tempo est égale à 1 on ajoute 9 (parce que c'est pas beau de faire +10)
                     tempo=tempo+9
